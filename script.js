@@ -39,6 +39,7 @@ const scoreElement = document.getElementById("score");
 let userAnswers = JSON.parse(localStorage.getItem("userAnswers")) || [];
 
 // Render the quiz questions and choices
+// Render the quiz questions and choices
 function renderQuestions() {
   questionsElement.innerHTML = ""; // Clear previous content
   for (let i = 0; i < questions.length; i++) {
@@ -47,7 +48,7 @@ function renderQuestions() {
     questionElement.className = "question";
 
     const questionText = document.createElement("p");
-    questionText.textContent = `${i + 1}. ${question.question}`;
+    questionText.textContent = question.question; // Removed the index prefix here
     questionElement.appendChild(questionText);
 
     for (let j = 0; j < question.choices.length; j++) {
