@@ -1,109 +1,52 @@
-// Array of quiz questions and choices
-const questions = [
-  {
-    question: "What is the capital of France?",
-    choices: ["Paris", "London", "Berlin", "Madrid"],
-    answer: "Paris",
-  },
-  {
-    question: "What is the highest mountain in the world?",
-    choices: ["Everest", "Kilimanjaro", "Denali", "Matterhorn"],
-    answer: "Everest",
-  },
-  {
-    question: "What is the largest country by area?",
-    choices: ["Russia", "China", "Canada", "United States"],
-    answer: "Russia",
-  },
-  {
-    question: "Which is the largest planet in our solar system?",
-    choices: ["Earth", "Jupiter", "Mars"],
-    answer: "Jupiter",
-  },
-  {
-    question: "What is the capital of Canada?",
-    choices: ["Toronto", "Montreal", "Vancouver", "Ottawa"],
-    answer: "Ottawa",
-  },
-];
-
-// Function to render the quiz questions and choices
+// Display the quiz questions and choices
 function renderQuestions() {
-  const questionsElement = document.getElementById("questions");
+  const questionsElement = document.getElementById("questions"); // Ensure this matches your HTML
   questionsElement.innerHTML = ""; // Clear any existing content
 
-  // Retrieve saved answers from local storage
-  const savedAnswers = JSON.parse(localStorage.getItem("userAnswers")) || {};
-
-  questions.forEach((question, i) => {
+  for (let i = 0; i < questions.length; i++) {
+    const question = questions[i];
     const questionElement = document.createElement("div");
-    questionElement.className = "question";
 
-    const questionText = document.createElement("p");
-    questionText.textContent = `${i + 1}. ${question.question}`;
+    // Add question number
+    const questionNumber = document.createElement("strong");
+    questionNumber.textContent = `${i + 1}. `;
+    questionElement.appendChild(questionNumber);
+
+    // Add question text
+    const questionText = document.createTextNode(question.question);
     questionElement.appendChild(questionText);
+    questionElement.appendChild(document.createElement("br")); // Line break after question
 
-    question.choices.forEach((choice) => {
+    // Add choices
+    for (let j = 0; j < question.choices.length; j++) {
+      const choice = question.choices[j];
       const choiceLabel = document.createElement("label");
-      const choiceInput = document.createElement("input");
-      choiceInput.type = "radio";
-      choiceInput.name = `question-${i}`;
-      choiceInput.value = choice;
+      const choiceElement = document.createElement("input");
+      choiceElement.setAttribute("type", "radio");
+      choiceElement.setAttribute("name", `question-${i}`);
+      choiceElement.setAttribute("value", choice);
 
       // Check if this choice was previously selected
-      if (savedAnswers[`question-${i}`] === choice) {
-        choiceInput.checked = true;
+      const savedAnswer = localStorage.getItem(`question-${i}`);
+      if (savedAnswer === choice) {
+        choiceElement.checked = true;
       }
 
-      // Save the user's choice when selected
-      choiceInput.addEventListener("change", () => {
-        savedAnswers[`question-${i}`] = choice;
-        localStorage.setItem("userAnswers", JSON.stringify(savedAnswers));
+      // Save the selected answer on change
+      choiceElement.addEventListener("change", () => {
+        localStorage.setItem(`question-${i}`, choice);
       });
 
-      choiceLabel.appendChild(choiceInput);
+      choiceLabel.appendChild(choiceElement);
       choiceLabel.appendChild(document.createTextNode(choice));
       questionElement.appendChild(choiceLabel);
-      questionElement.appendChild(document.createElement("br"));
-    });
+      questionElement.appendChild(document.createElement("br")); // Line break after each choice
+    }
 
     questionsElement.appendChild(questionElement);
-  });
-}
-
-// Function to calculate and display the user's score
-function submitQuiz() {
-  const savedAnswers = JSON.parse(localStorage.getItem("userAnswers")) || {};
-  let score = 0;
-
-  questions.forEach((question, i) => {
-    if (savedAnswers[`question-${i}`] === question.answer) {
-      score++;
-    }
-  });
-
-  // Display the score
-  const scoreElement = document.getElementById("score");
-  scoreElement.textContent = `Your score is ${score} out of ${questions.length}.`;
-
-  // Save the score in local storage
-  localStorage.setItem("score", score);
-}
-
-// Function to display the saved score from local storage
-function displaySavedScore() {
-  const savedScore = localStorage.getItem("score");
-  const scoreElement = document.getElementById("score");
-  if (savedScore !== null) {
-    scoreElement.textContent = `Your previous score was ${savedScore} out of ${questions.length}.`;
+    questionsElement.appendChild(document.createElement("br")); // Extra space between questions
   }
 }
 
-// Initialize the quiz on page load
-document.addEventListener("DOMContentLoaded", () => {
-  renderQuestions();
-  displaySavedScore();
-
-  const submitButton = document.getElementById("submit");
-  submitButton.addEventListener("click", submitQuiz);
-});
+// Call the function to render questions on page load
+document.addEventListener("DOMContentLoaded", renderQuestions);
